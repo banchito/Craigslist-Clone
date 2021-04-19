@@ -1,0 +1,94 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  background-color: #e9cbc0;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+}
+
+.searchBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 10%;
+  width: 50%;
+}
+
+.material-icons {
+  color: rgb(203, 63, 63);
+  justify-content: center;
+}
+
+.nav-link {
+  color: rgb(203, 63, 63);
+}
+
+main {
+  display: flex;
+  flex-direction: row;
+  background-color: coral;
+  /* height: 50rem; */
+  height: 100%;
+}
+
+#registration{
+    height: 30%;
+}
+.cards-div {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  flex-wrap: wrap;
+  height: 25%;
+}
+
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  /* flex-direction: row; */
+  margin: .5%;
+  width: 30%;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  align-items: center;
+  flex: 0 256px;
+  background-color:#c3dc70;
+  margin: 1%;
+  margin-right: 5%;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: .5rem;
+  height: 50%;
+}
+
+#post-title, #post-body, #post-price{
+ margin-top: 3%;
+}
+
+.btn, .btn-primary{
+    margin: 2%;
+    width: 40%;  
+}
+
+footer {
+  display: flex;
+  flex-direction: row;
+  background-color: #e9cbc0;
+  align-items: center;
+  justify-content: center;
+}
