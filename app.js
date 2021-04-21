@@ -30,6 +30,13 @@ const fetchUserData = async () => {
   }
 };
 
+const fetchAndRender = async () => {
+    const posts = await fetchPosts();
+    const userData = await fetchUserData();
+  
+    renderPost(userData, posts.data.posts);
+  };
+
 const renderPost = (userData, posts) => {
   $(".cards-div").empty();
   posts.forEach((post) => {
@@ -151,12 +158,11 @@ const hideRegistration = () => {
   }
 };
 
-const fetchAndRender = async () => {
-  const posts = await fetchPosts();
-  const userData = await fetchUserData();
 
-  renderPost(userData, posts.data.posts);
-};
+
+
+
+
 
 const createPost = async (postObject) => {
   //console.log(postObject);
