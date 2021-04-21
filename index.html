@@ -50,56 +50,96 @@
       </div>
     </header>
     <main>
-        <form id="registration" class="row">
-            <div class="form-group">
-                <h3>Register</h3>
-                <label for="exampleInputUsername">Username</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="exampleInputUsername"
-                    aria-describedby="usernameHelp"
-                    placeholder="Enter username"
-                />
+      <form id="registration" class="row">
+        <div class="form-group">
+          <h3>Register</h3>
+          <label for="exampleInputUsername">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="exampleInputUsername"
+            aria-describedby="usernameHelp"
+            placeholder="Enter username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="exampleInputPassword"
+            placeholder="Password"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button type="submit" id="login" class="btn btn-primary">Login</button>
+      </form>
+      <div class="cards-div"></div>
+      <form id="post-form" class="row">
+        <div>
+          <input
+            type="text"
+            placeholder="Post Title"
+            class="form-control"
+            id="post-title"
+          />
+        </div>
+        <div>
+          <textarea
+            placeholder="Post body"
+            class="form-control"
+            id="post-body"
+            rows="7"
+          ></textarea>
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Price"
+            class="form-control"
+            id="post-price"
+          />
+        </div>
+        <div>
+          <button id="post-btn" type="submit" class="btn btn-primary">
+            Post
+          </button>
+        </div>
+      </form>
+      <div class="modal">
+        <form id="message-form" class="row">
+          <div class="card-message">
+            <div class="card-body-message">
+              <h5 class="card-title"></h5>
+              <p class="card-desc"></p>
+              <p class="card-price"></p>
             </div>
-            <div class="form-group">
-                <label for="exampleInputPassword">Password</label>
-                <input
-                    type="password"
-                    class="form-control"
-                    id="exampleInputPassword"
-                    placeholder="Password"
-                />
-            </div>
-            <button type="submit" class="btn btn-primary">Sign In</button>
-            <button type="submit" id="login" class="btn btn-primary">Login</button>
-        </form>
-        <div class="cards-div"></div>
-        <form id="post-form" class="row">
-          <div>
-            <!-- <label for="inputEmail4" class="form-label">Post Title</label> -->
-            <input type="text" placeholder="Post Title" class="form-control" id="post-title" />
           </div>
           <div>
-            <!-- <label for="exampleFormControlTextarea1" class="form-label" -->
-              <!-- >Post Body</label -->
-            <!-- > -->
+            <label for="message-body" class="message-label"
+              >Your Message to:</label
+            >
             <textarea
-                placeholder="Post body"
+              placeholder=""
               class="form-control"
-              id="post-body"
-              rows="7"
+              id="message-body"
+              rows="10"
             ></textarea>
           </div>
-          <div>
-            <!-- <label for="inputEmail4" class="form-label">Price</label> -->
-            <input type="text" placeholder="Price" class="form-control" id="post-price" />
-          </div>
-          <div>
-            <button id="post-btn" type="submit" class="btn btn-primary">Post</button>
+          <div id="message-buttons">
+            <button id="message-btn" type="submit" class="btn btn-primary">
+              Send
+            </button>
+            <button
+              id="cancel-messageBtn"
+              
+              class="btn btn-primary"
+            >
+              Cancel
+            </button>
           </div>
         </form>
-      
+      </div>
     </main>
     <footer>
       <ul class="nav justify-content-center">
@@ -112,9 +152,6 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Link</a>
         </li>
-        <!-- <li class="nav-item"> -->
-        <!-- <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a> -->
-        <!-- </li> -->
       </ul>
     </footer>
   </body>
