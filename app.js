@@ -2,7 +2,33 @@ const BASE_URL =
   "https://strangers-things.herokuapp.com/api/2102-CPU-RM-WEB-PT";
 let loginClick = false;
 
-// Async/Await ES6
+// C R U D
+// Create Posts
+const createPost = async (postObject) => {
+  //console.log(postObject);
+  const token = fetchToken();
+  if (token) {
+    try {
+      const response = await fetch(`${BASE_URL}/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(postObject),
+      });
+      const newPost = await response.json();
+      return newPost;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  } else {
+    //console.log("please log in or register")
+  }
+};
+
+// Read Posts
 const fetchPosts = async () => {
   try {
     const response = await fetch(`${BASE_URL}/posts`);
@@ -14,107 +40,78 @@ const fetchPosts = async () => {
   }
 };
 
-const fetchUserData = async () => {
+// Edit - Update Posts
+const updatePost = async (postId, updatedPost) => {
   const token = fetchToken();
-  if(token){
   try {
-    const response = await fetch(`${BASE_URL}/users/me`, {
+    const response = await fetch(`${BASE_URL}/posts/${postId}`, {
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify(updatedPost),
     });
     const result = await response.json();
-    console.log(result.data);
+    console.log(result);
     return result;
   } catch (error) {
     console.log(error);
+    throw error;
   }
-}
 };
 
-const fetchAndRender = async () => {
-    const posts = await fetchPosts();
-    const userData = await fetchUserData();
-  
-    renderPost(userData, posts.data.posts);
-  };
+// Delete Posts
+const deletePost = async (postId) => {
+  const token = fetchToken();
 
-
-const renderMessages = ( {messages} = post) => {
-    
-    $(".modal-body").empty(); 
-    
-    if(messages.length === 0 ) return $(".modal-body").append('<h5>No messages to Show</h5>')
-
-    messages.forEach((message) => {
-        const messageElem = createMessageHtml(message)
-        
-        $(".modal-body").append(messageElem)
-    })
-}
-
-const createMessageHtml = (message) =>{
-
-    const {content, fromUser: {username}} = message
-    
-    return $(`
-    
-    <div class="message">
-    
-     <h5 class="message-fromUser">From ${username}:</h5>
-         <p class="card-desc">${content}</p>
-    
-   </div>
-   <hr>
-    `)
-}
-
-const renderPost = (userData, posts) => {
-  $(".cards-div").empty();
-  posts.forEach((post) => {
-    const postElem = createPostHtml(userData, post);
-    $(".cards-div").append(postElem);
-  });
+  if (token) {
+    try {
+      const response = await fetch(`${BASE_URL}/posts/${postId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 };
 
-function createPostHtml(userData, post) {
-    const token = fetchToken()
+// Fetching logged user's relevant data
+const fetchUserData = async () => {
+  const token = fetchToken();
+  if (token) {
+    try {
+      const response = await fetch(`${BASE_URL}/users/me`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      console.log(result.data);
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
 
-  const {
-    title,
-    description,
-    price,
-    author: { username, _id },
-  } = post;
+// AUTHENTICATION
 
-  return $(`
-    <div class="card" >
-        <div class="card-body"  >
-          <h5 class="card-title">${title}</h5>
-          <p class="card-text">${description}</p>
-          <p class="card-text"><span class="badge bg-primary">${price}</span></p>
-          <p class="card-text"><b>${username}</b></p>
-          
-            ${ token ?
-              userData.data._id === _id
-                ? `
-                <div class="btn-group" role="group" aria-label="Basic outlined example">
-                <button id="btn-delete" class="btn btn-primary">Delete</button>
-                <button id="btn-edit" class="btn btn-primary">Edit</button>    
-                <button id="btn-seeMessages" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">See Messages</button>
-                </div>
-                     `
-                : `<div class="btn-group" role="group" aria-label="Basic outlined example">
-                <button id="btn-message" class="btn btn-primary">Send a Message</button> 
-                </div>`
-                
-                : ""
-            }
-        </div>
-  </div> `).data("post", post);
- 
-}
+//Fetch a token from local Storage
+const fetchToken = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
+  return token ? token : console.log("Please Register or Log in");
+};
+
+// Register a new User
 const registerUser = async (userName, password) => {
   try {
     const response = await fetch(`${BASE_URL}/users/register`, {
@@ -141,6 +138,7 @@ const registerUser = async (userName, password) => {
   }
 };
 
+// Log an existing User
 const loginUser = async (userName, password) => {
   try {
     const response = await fetch(`${BASE_URL}/users/login`, {
@@ -167,25 +165,7 @@ const loginUser = async (userName, password) => {
   }
 };
 
-$("#registration").on("click", (event) => {
-  const idBtn = event.target.id;
-  idBtn === "login" && (loginClick = true);
-});
-
-$("#registration").on("submit", (event) => {
-  event.preventDefault();
-  const username = $("#exampleInputUsername").val().trim();
-
-  const password = $("#exampleInputPassword").val().trim();
-
-  loginClick ? loginUser(username, password) : registerUser(username, password);
-});
-
-const fetchToken = () => {
-  const token = JSON.parse(localStorage.getItem("token"));
-  return token ? token : console.log("Please Register or Log in");
-};
-
+// When existing users logs in, the authentication form disapears and post form appears
 const hideRegistration = () => {
   const token = fetchToken();
 
@@ -201,45 +181,165 @@ const hideRegistration = () => {
   }
 };
 
+// When a logged user logs off, the post form disapear and the authentication form appears
+function showHomePage() {
+  $("#registration").css("display", "inline");
+  $("#post-form").css("visibility", "hidden");
+  $("#post-form").addClass("disabled");
+  fetchAndRender();
+}
 
-const createPost = async (postObject) => {
-  //console.log(postObject);
+// API call to create a message for a post whose _id is equal to POST_ID
+const sendMessage = async (messageData, postId) => {
+  const {
+    post: { _id },
+  } = postId;
+
   const token = fetchToken();
+  try {
+    const response = await fetch(`${BASE_URL}/posts/${_id}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(messageData),
+    });
+    const result = await response.json();
 
-  if (token) {
-    try {
-      const response = await fetch(`${BASE_URL}/posts`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(postObject),
-      });
-      const newPost = await response.json();
-      return newPost;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  } else {
-    //console.log("please log in or register")
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
-$('#cancelPost-btn').on('click', (event)=>{
-    event.preventDefault()
-    $("#post-title").val("");
-    $("#post-body").val("");
-    $("#post-price").val("");
-  
-})
 
+//RENDERING
+
+//fetch posts and logged user relevant data and call render function
+const fetchAndRender = async () => {
+  const posts = await fetchPosts();
+  const userData = await fetchUserData();
+
+  renderPost(userData, posts.data.posts);
+};
+
+//Receives objects from event handler, calls the render function and appends a post/card to HTML
+const renderPost = (userData, posts) => {
+  $(".cards-div").empty();
+  posts.forEach((post) => {
+    const postElem = createPostHtml(userData, post);
+    $(".cards-div").append(postElem);
+  });
+};
+
+//Creates html element of a post/card with relevant info fetched from API call
+function createPostHtml(userData, post) {
+  const token = fetchToken();
+
+  const {
+    title,
+    description,
+    price,
+    author: { username, _id },
+  } = post;
+
+  return $(`
+      <div class="card" >
+          <div class="card-body"  >
+            <h5 class="card-title">${title}</h5>
+            <p class="card-text">${description}</p>
+            <p class="card-text"><span class="badge bg-primary"><span>$</span>${price}</span></p>
+            <p class="card-text"><b>${username}</b></p>
+            
+              ${
+                token
+                  ? userData.data._id === _id
+                    ? `
+                  <div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <button id="btn-delete" class="btn btn-primary">Delete</button>
+                  <button id="btn-edit" class="btn btn-primary">Edit</button>    
+                  <button id="btn-seeMessages" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">See Messages</button>
+                  </div>
+                       `
+                    : `<div class="btn-group" role="group" aria-label="Basic outlined example">
+                  <button id="btn-message" class="btn btn-primary">Send a Message</button> 
+                  </div>`
+                  : ""
+              }
+          </div>
+    </div> `).data("post", post);
+}
+
+//Creates html element of a message with relevant info fetched from API call
+const renderMessages = ({ messages } = post) => {
+  console.log(messages);
+  $(".modal-body").empty();
+
+  if (messages.length === 0)
+    return $(".modal-body").append("<h5>No Messages To Show</h5>");
+
+  messages.forEach((message) => {
+    const messageElem = createMessageHtml(message);
+
+    $(".modal-body").append(messageElem);
+  });
+};
+
+//Creates html element of a message with relevant info fetched from API call
+const createMessageHtml = (message) => {
+  const {
+    content,
+    fromUser: { username },
+  } = message;
+
+  return $(`
+    <div class="message">
+     <h5 class="message-fromUser">From ${username}:</h5>
+         <p class="card-desc">${content}</p>
+   </div>
+   <hr>
+    `);
+};
+
+//EVENT HANDLERS
+
+// REGISTRATION FORM
+// Gets the ID for the login button in the registration form
+$("#registration").on("click", (event) => {
+  const idBtn = event.target.id;
+  idBtn === "login" && (loginClick = true);
+});
+
+//If the submit in registration from is from the login button then log user with login func, otherwise user register func.
+$("#registration").on("submit", (event) => {
+  event.preventDefault();
+
+  const username = $("#exampleInputUsername").val().trim();
+  const password = $("#exampleInputPassword").val().trim();
+
+  loginClick ? loginUser(username, password) : registerUser(username, password);
+
+  $("#exampleInputUsername").val(null);
+  $("#exampleInputPassword").val(null);
+});
+
+//POST FORM
+
+//if cancel button is clicked sets the inputs to empty.
+$("#cancelPost-btn").on("click", (event) => {
+  event.preventDefault();
+  $("#post-title").val("");
+  $("#post-body").val("");
+  $("#post-price").val("");
+});
+
+//when post form is submited edit a post if there is a card.data attached to the form, otherwise create a new post
 $("#post-form").on("submit", async (event) => {
   event.preventDefault();
 
-  const { card, postElem } = $("#post-form").data();
+  const { card } = $("#post-form").data();
   //console.log(card, postElem);
-
   const postData = {
     post: {
       title: $("#post-title").val(),
@@ -270,61 +370,18 @@ $("#post-form").on("submit", async (event) => {
   }
 });
 
-const updatePost = async (postId, updatedPost) => {
-  const token = fetchToken();
-  try {
-    const response = await fetch(`${BASE_URL}/posts/${postId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedPost),
-    });
-    const result = await response.json();
-    console.log(result);
-    return result;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
 
-const deletePost = async (postId) => {
-  const token = fetchToken();
-
-  if (token) {
-    try {
-      const response = await fetch(`${BASE_URL}/posts/${postId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-};
-
+// event handler managing user interaction with a post card (Delete, Edit, Send Message, See Mesages from a post)
 $(".cards-div").on("click", async (event) => {
   const idBtn = event.target.id;
-  console.log(idBtn)
+  console.log(idBtn);
 
   const divCardElem = $(event.target).parent().parent().parent();
-  console.log(divCardElem)
+  console.log(divCardElem);
   const card = divCardElem.data();
-  console.log(card)
+  console.log(card);
 
   const cardsDivElem = divCardElem.parent();
-  
-  // console.log(card, postElem);
-  // const { post: { _id }} = card;
-  // console.log(_id);
 
   if (idBtn === "btn-delete") {
     try {
@@ -334,21 +391,21 @@ $(".cards-div").on("click", async (event) => {
       console.log(error);
       throw error;
     }
-  } 
+  }
 
-   if (idBtn === "btn-edit") { 
-    $("#post-form").data({ card,  cardsDivElem });
+  if (idBtn === "btn-edit") {
+    $("#post-form").data({ card, cardsDivElem });
     // console.log(newCard)
     //const data = $("#post-form").data(); //erase lines
     //console.log(data); //erase
     $("#post-title").val(card.post.title);
     $("#post-body").val(card.post.description);
     $("#post-price").val(card.post.price);
-  } 
+  }
 
-   if (idBtn === "btn-message") {
+  if (idBtn === "btn-message") {
     $("#message-form").data({ card });
-    console.log(card)
+    console.log(card);
     //const data = $("#message-form").data(); //erase
     //console.log(data); //erase
     $(".modal").addClass("open");
@@ -361,81 +418,89 @@ $(".cards-div").on("click", async (event) => {
     $(".card-price-message").text(`${card.post.price}`);
   }
 
-  if(idBtn === "btn-seeMessages"){
-    const {post:{_id}} = card
+  if (idBtn === "btn-seeMessages") {
+    const {
+      post: { _id },
+    } = card;
     //console.log(_id)
     //we want 608233660c60d80017f5189a
-    const{data:{posts}} = await fetchUserData()
-    console.log(posts)
+    try {
+      const {
+        data: { posts },
+      } = await fetchUserData();
+      console.log(posts);
 
-    posts.forEach((post)=>{
-        //console.log(post)
-        if (post._id === _id) { 
-            
-            renderMessages(post)
+      posts.forEach((post) => {
+        console.log(post);
+        if (post._id === _id) {
+          renderMessages(post);
         }
-    });
-    $('#exampleModal').addClass("open");
-    
+      });
+      $("#exampleModal").addClass("open");
+    } catch (error) {
+      throw error;
+    }
   }
 });
 
-
+//Close the modal for send messages
 $("#cancel-messageBtn").on("click", () => {
   $(".modal").removeClass("open");
-  $("#message-body").val("")
+  $("#message-body").val("");
 });
 
+//On message-form submit creates a message object and calls sendMessage API call.
 $("#message-form").on("submit", async (event) => {
   event.preventDefault();
 
-  const cardId = $('#message-form').data("card")
-    console.log(cardId)
+  const cardId = $("#message-form").data("card");
+  console.log(cardId);
 
   const messageData = {
     message: {
       content: $("#message-body").val(),
     },
   };
-  if ($("#message-body").val() === "")  return
+
+  if ($("#message-body").val() === "") return;
 
   try {
     const result = await sendMessage(messageData, cardId);
     console.log(result);
     $(".modal").removeClass("open");
-    $("#message-body").val(null)
+    $("#message-body").val(null);
   } catch (error) {
     console.log(error);
     throw error;
   }
 });
 
-const sendMessage = async (messageData, postId) => {
-    const {post:{_id}}=postId
 
-  const token = fetchToken();
+//Header button to fetch all messages a logged user might receive from all users
+$("#allMesgs-headerBtn").on("click", async () => {
   try {
-    const response = await fetch(
-      `${BASE_URL}/posts/${_id}/messages`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(messageData),
-      }
-    );
-    const result = await response.json();
-    
-    return result;
+    const {
+      data: { posts },
+    } = await fetchUserData();
+    console.log(posts);
+    posts.forEach((post) => {
+      post.messages.length > 0 && renderMessages(post);
+    });
+    $("#exampleModal").addClass("open");
   } catch (error) {
-    console.log(error);
     throw error;
   }
-};
+});
+
+//Header button to logout
+$("#logOut-headerBtn").on("click", () => {
+  localStorage.removeItem("token");
+
+  showHomePage();
+});
 
 
+//EFI function to start the website cicle
 (async () => {
   hideRegistration();
 })();

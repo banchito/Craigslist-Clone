@@ -12,6 +12,16 @@ header {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
+.headerBtns{
+  align-items: center;
+  width: 50%;
+}
+
+
+
+
+
+
 .navbar {
   display: flex;
   flex-direction: row;
@@ -154,18 +164,6 @@ backdrop-filter: blur(6px);
 
   backdrop-filter: blur(6px);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #message-form {
