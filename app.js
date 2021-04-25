@@ -23,9 +23,7 @@ const createPost = async (postObject) => {
     } catch (error) {
       throw error;
     }
-  } else {
-    return alert("please Register or Login")
-  }
+  } 
 };
 
 // Read Posts
@@ -103,7 +101,7 @@ const fetchUserData = async () => {
 //Fetch a token from local Storage
 const fetchToken = () => {
   const token = JSON.parse(localStorage.getItem("token"));
-  return token ? token : alert("Please Register or Log in");
+  return token ? token : "";
 };
 
 // Register a new User
