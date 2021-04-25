@@ -6,7 +6,7 @@ let signClick  = false;
 // C R U D
 // Create Posts
 const createPost = async (postObject) => {
-  //console.log(postObject);
+  
   const token = fetchToken();
   if (token) {
     try {
@@ -21,11 +21,10 @@ const createPost = async (postObject) => {
       const newPost = await response.json();
       return newPost;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   } else {
-    //console.log("please log in or register")
+    return alert("please Register or Login")
   }
 };
 
@@ -34,10 +33,11 @@ const fetchPosts = async () => {
   try {
     const response = await fetch(`${BASE_URL}/posts`);
     const data = await response.json();
-    console.log(data);
+    
     return data;
   } catch (error) {
-    console.log(error);
+    
+    throw error
   }
 };
 
@@ -54,10 +54,8 @@ const updatePost = async (postId, updatedPost) => {
       body: JSON.stringify(updatedPost),
     });
     const result = await response.json();
-    console.log(result);
     return result;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -76,9 +74,7 @@ const deletePost = async (postId) => {
         },
       });
       const result = await response.json();
-      console.log(result);
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -96,10 +92,8 @@ const fetchUserData = async () => {
         },
       });
       const result = await response.json();
-      console.log(result.data);
       return result;
     } catch (error) {
-      console.log(error);
     }
   }
 };
@@ -109,7 +103,7 @@ const fetchUserData = async () => {
 //Fetch a token from local Storage
 const fetchToken = () => {
   const token = JSON.parse(localStorage.getItem("token"));
-  return token ? token : console.log("Please Register or Log in");
+  return token ? token : alert("Please Register or Log in");
 };
 
 // Register a new User
@@ -130,11 +124,9 @@ const registerUser = async (userName, password) => {
     const {
       data: { token },
     } = await response.json();
-    //console.log(data)
     localStorage.setItem("token", JSON.stringify(token));
     hideRegistration();
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -161,7 +153,6 @@ const loginUser = async (userName, password) => {
     localStorage.setItem("token", JSON.stringify(token));
     hideRegistration();
   } catch (error) {
-    console.log(error.message);
     throw error;
   }
 };
@@ -224,7 +215,6 @@ const sendMessage = async (messageData, postId) => {
 
     return result;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -241,7 +231,6 @@ const fetchAndRender = async () => {
 
 //Receives objects from event handler, calls the render function and appends a post/card to HTML
 const renderPost = (userData, posts) => {
-  console.log(posts)
   $(".cards-div").empty();
   posts.forEach((post) => {
     const postElem = createPostHtml(userData, post);
@@ -289,7 +278,6 @@ function createPostHtml(userData, post) {
 
 //Creates html element of a message with relevant info fetched from API call
 const renderMessages = ({ messages } = post) => {
-  console.log(messages);
   $(".modal-body").empty();
 
   if (messages.length === 0)
@@ -307,7 +295,6 @@ const renderMessages = ({ messages } = post) => {
 const renderAllMessages = ( messages ) => {
   $(".modal-body").empty();
  
-   console.log(messages);
 
   if (messages.length === 0) return $(".modal-body").append("<h5>No Messages To Show</h5>");
     messages.forEach((message) => {
@@ -378,7 +365,6 @@ $("#post-form").on("submit", async (event) => {
   event.preventDefault();
 
   const { card } = $("#post-form").data();
-  //console.log(card, postElem);
   const postData = {
     post: {
       title: $("#post-title").val(),
@@ -389,11 +375,8 @@ $("#post-form").on("submit", async (event) => {
 
   try {
     if (card) {
-      //editing
-      console.log(card, "editing");
-
+      
       const result = await updatePost(card.post._id, postData);
-      console.log("result is:", result);
       fetchAndRender();
       $("#post-form").data({ card: null, postElem: null });
       $("#post-form").trigger("reset");
@@ -404,7 +387,6 @@ $("#post-form").on("submit", async (event) => {
       $(".row").trigger("reset");
     }
   } catch (error) {
-    console.log(error);
     throw error;
   }
 });
@@ -413,12 +395,9 @@ $("#post-form").on("submit", async (event) => {
 // event handler managing user interaction with a post card (Delete, Edit, Send Message, See Mesages from a post)
 $(".cards-div").on("click", async (event) => {
   const idBtn = event.target.id;
-  console.log(idBtn);
 
   const divCardElem = $(event.target).parent().parent().parent();
-  console.log(divCardElem);
   const card = divCardElem.data();
-  console.log(card);
 
   const cardsDivElem = divCardElem.parent();
 
@@ -427,7 +406,6 @@ $(".cards-div").on("click", async (event) => {
       await deletePost(card.post._id);
       fetchAndRender();
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -441,7 +419,6 @@ $(".cards-div").on("click", async (event) => {
 
   if (idBtn === "btn-sendMessage") {
     $("#message-form").data({ card });
-    console.log(card);
     
     $(".modal").addClass("open");
     $(".message-label")
@@ -461,10 +438,8 @@ $(".cards-div").on("click", async (event) => {
       const {
         data: { posts },
       } = await fetchUserData();
-      console.log(posts);
 
       posts.forEach((post) => {
-        console.log(post);
         if (post._id === _id) {
           renderMessages(post);
         }
@@ -487,7 +462,6 @@ $("#message-form").on("submit", async (event) => {
   event.preventDefault();
 
   const cardId = $("#message-form").data("card");
-  console.log(cardId);
 
   const messageData = {
     message: {
@@ -498,12 +472,10 @@ $("#message-form").on("submit", async (event) => {
   if ($("#message-body").val() === "") return;
 
   try {
-    const result = await sendMessage(messageData, cardId);
-    console.log(result);
+    await sendMessage(messageData, cardId);
     $(".modal").removeClass("open");
     $("#message-body").val(null);
   } catch (error) {
-    console.log(error);
     throw error;
   }
 });
@@ -528,7 +500,6 @@ $("#Search-headerBtn").on('click', async()=>{
 
 //Header Button to get all Messages
 $("#allPosts-headerBtn").on('click', async()=>{
-  console.log("clicked")
   try{
     fetchAndRender()
   }catch(error){
@@ -545,7 +516,6 @@ $("#allMesgs-headerBtn").on("click", async () => {
     const {
       data: { posts },
     } = await fetchUserData();
-    console.log(posts);
     let allMessages = []
     posts.forEach((post) => {
       post.messages.length > 0 && allMessages.push(post.messages);
