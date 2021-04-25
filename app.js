@@ -167,6 +167,7 @@ const loginUser = async (userName, password) => {
 };
 
 // When existing users logs in, the authentication form disapears and post form appears
+// get all messages button toggles when logon/off
 const hideRegistration = () => {
   const token = fetchToken();
 
@@ -184,7 +185,7 @@ const hideRegistration = () => {
   } else {
     $("#post-form").css("visibility", "hidden");
     $("#post-form").addClass("disabled");
-    
+
     $("#allMesgs-headerBtn").css("visibility", "hidden");
     $("#allMesgs-headerBtn").addClass('disabled')
     $("#allMesgs-headerBtn").removeAttr("data-bs-toggle");
@@ -194,6 +195,7 @@ const hideRegistration = () => {
 };
 
 // When a logged user logs off, the post form disapear and the authentication form appears
+// all messages button disabled
 function showHomePage() {
   $("#registration").css("display", "inline");
   $("#post-form").css("visibility", "hidden");
