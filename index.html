@@ -43,12 +43,15 @@
       <div class="searchBar">
         <input
           class="form-control"
+          id="search-bar"
           type="text"
           placeholder="Search"
           aria-label="default input example"
         />
       </div>
       <div class="btn-group headerBtns">
+        <a id="Search-headerBtn"class="btn btn-primary">Search</a>
+        <a id="allPosts-headerBtn"class="btn btn-primary">Get All Posts</a>
         <a id="allMesgs-headerBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Messages</a>
         <a id="logOut-headerBtn"class="btn btn-primary">Log Off</a>
       </div>
@@ -75,7 +78,7 @@
             placeholder="Password"
           />
         </div>
-        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button type="submit" id="signin" class="btn btn-primary">Sign In</button>
         <button type="submit" id="login" class="btn btn-primary">Login</button>
       </form>
       <div class="cards-div"></div>

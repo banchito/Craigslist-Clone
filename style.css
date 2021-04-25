@@ -12,15 +12,10 @@ header {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
-.headerBtns{
+.headerBtns {
   align-items: center;
   width: 50%;
 }
-
-
-
-
-
 
 .navbar {
   display: flex;
@@ -114,7 +109,7 @@ main {
   width: 40%;
 }
 
-#btn-message {
+#btn-sendMessage {
   width: 45%;
 }
 
@@ -131,21 +126,20 @@ footer {
 }
 
 .modalSeeMsgs.open {
-  
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-display: flex;
-align-items: center;
-justify-content: center;
-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
 }
 
-.card-message{
+.card-message {
   position: sticky;
-  top: 0; 
+  top: 0;
 }
 
 .modal:not(.open) {
@@ -165,7 +159,6 @@ backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
-
 #message-form {
   position: sticky;
   top: 0;
@@ -180,7 +173,7 @@ backdrop-filter: blur(6px);
 #message-form {
   display: flex;
   flex: 0 450px;
-  height: 86%;
+  height: 34rem;
   width: 100%;
   padding-top: 3%;
   padding-bottom: 26%;
@@ -199,12 +192,6 @@ backdrop-filter: blur(6px);
 }
 
 .card-message {
-  /* display: flex; */
-  /* flex-wrap: wrap; */
-  /* word-wrap: normal; */
-  /* flex-direction: row; */
-  /* margin: 5%; */
-
   width: 27rem;
   height: 11rem;
   margin-bottom: 2rem;

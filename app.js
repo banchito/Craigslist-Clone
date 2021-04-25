@@ -1,6 +1,7 @@
 const BASE_URL =
   "https://strangers-things.herokuapp.com/api/2102-CPU-RM-WEB-PT";
 let loginClick = false;
+let signClick  = false;
 
 // C R U D
 // Create Posts
@@ -171,12 +172,23 @@ const hideRegistration = () => {
 
   if (token) {
     $("#registration").css("display", "none");
+
     $("#post-form").css("visibility", "visible");
     $("#post-form").removeClass("disabled");
+    $("#post-form").removeClass("disabled");
+
+    $("#allMesgs-headerBtn").removeClass('disabled')
+    $("#allMesgs-headerBtn").css("visibility", "visible");
+    $("#allMesgs-headerBtn").attr("data-bs-toggle",'modal');
     fetchAndRender();
   } else {
     $("#post-form").css("visibility", "hidden");
     $("#post-form").addClass("disabled");
+    
+    $("#allMesgs-headerBtn").css("visibility", "hidden");
+    $("#allMesgs-headerBtn").addClass('disabled')
+    $("#allMesgs-headerBtn").removeAttr("data-bs-toggle");
+    
     fetchAndRender();
   }
 };
@@ -186,6 +198,7 @@ function showHomePage() {
   $("#registration").css("display", "inline");
   $("#post-form").css("visibility", "hidden");
   $("#post-form").addClass("disabled");
+  $("#allMesgs-headerBtn").addClass('disabled')
   fetchAndRender();
 }
 
@@ -226,6 +239,7 @@ const fetchAndRender = async () => {
 
 //Receives objects from event handler, calls the render function and appends a post/card to HTML
 const renderPost = (userData, posts) => {
+  console.log(posts)
   $(".cards-div").empty();
   posts.forEach((post) => {
     const postElem = createPostHtml(userData, post);
@@ -263,7 +277,7 @@ function createPostHtml(userData, post) {
                   </div>
                        `
                     : `<div class="btn-group" role="group" aria-label="Basic outlined example">
-                  <button id="btn-message" class="btn btn-primary">Send a Message</button> 
+                  <button id="btn-sendMessage" class="btn btn-primary">Send a Message</button> 
                   </div>`
                   : ""
               }
@@ -282,6 +296,20 @@ const renderMessages = ({ messages } = post) => {
   messages.forEach((message) => {
     const messageElem = createMessageHtml(message);
 
+    $(".modal-body").append(messageElem);
+  });
+};
+
+
+//Creates html element for all messages an registered user has received
+const renderAllMessages = ( messages ) => {
+  $(".modal-body").empty();
+ 
+   console.log(messages);
+
+  if (messages.length === 0) return $(".modal-body").append("<h5>No Messages To Show</h5>");
+    messages.forEach((message) => {
+    const messageElem = createMessageHtml(message);
     $(".modal-body").append(messageElem);
   });
 };
@@ -308,24 +336,33 @@ const createMessageHtml = (message) => {
 // Gets the ID for the login button in the registration form
 $("#registration").on("click", (event) => {
   const idBtn = event.target.id;
-  idBtn === "login" && (loginClick = true);
+  if(idBtn === "login") return loginClick = true
+  if(idBtn === "signin") return signClick = true
+
 });
 
 //If the submit in registration from is from the login button then log user with login func, otherwise user register func.
 $("#registration").on("submit", (event) => {
   event.preventDefault();
-
+  
   const username = $("#exampleInputUsername").val().trim();
   const password = $("#exampleInputPassword").val().trim();
-
-  loginClick ? loginUser(username, password) : registerUser(username, password);
+  
+  if(loginClick){
+    loginUser(username, password);
+    signClick = false;
+  } 
+  
+  if(signClick){
+    registerUser(username, password);
+    loginClick = false;
+  }
 
   $("#exampleInputUsername").val(null);
   $("#exampleInputPassword").val(null);
 });
 
 //POST FORM
-
 //if cancel button is clicked sets the inputs to empty.
 $("#cancelPost-btn").on("click", (event) => {
   event.preventDefault();
@@ -395,19 +432,15 @@ $(".cards-div").on("click", async (event) => {
 
   if (idBtn === "btn-edit") {
     $("#post-form").data({ card, cardsDivElem });
-    // console.log(newCard)
-    //const data = $("#post-form").data(); //erase lines
-    //console.log(data); //erase
     $("#post-title").val(card.post.title);
     $("#post-body").val(card.post.description);
     $("#post-price").val(card.post.price);
   }
 
-  if (idBtn === "btn-message") {
+  if (idBtn === "btn-sendMessage") {
     $("#message-form").data({ card });
     console.log(card);
-    //const data = $("#message-form").data(); //erase
-    //console.log(data); //erase
+    
     $(".modal").addClass("open");
     $(".message-label")
       .text(`Your message to: ${card.post.author.username}`)
@@ -422,8 +455,6 @@ $(".cards-div").on("click", async (event) => {
     const {
       post: { _id },
     } = card;
-    //console.log(_id)
-    //we want 608233660c60d80017f5189a
     try {
       const {
         data: { posts },
@@ -475,27 +506,60 @@ $("#message-form").on("submit", async (event) => {
   }
 });
 
+//Helper function that filters posts based on the search val
+const queryPosts = (post, searchInput) =>{
+  return post.title.toLowerCase().includes(searchInput.toLowerCase()) || post.author.username.toLowerCase().includes(searchInput.toLowerCase()) || post.description.toLowerCase().includes(searchInput.toLowerCase())
+}
+
+//Header button to filter posts
+$("#Search-headerBtn").on('click', async()=>{
+  
+  let searchInput = $("#search-bar").val().trim()
+  const {data:{posts}} = await fetchPosts()
+  const filteredPosts = posts.filter(post => queryPosts(post, searchInput))
+  const userData = await fetchUserData();
+
+  renderPost(userData, filteredPosts);
+  $('#search-bar').val('')
+  
+})
+
+//Header Button to get all Messages
+$("#allPosts-headerBtn").on('click', async()=>{
+  console.log("clicked")
+  try{
+    fetchAndRender()
+  }catch(error){
+    throw error
+  }
+  
+})
 
 //Header button to fetch all messages a logged user might receive from all users
 $("#allMesgs-headerBtn").on("click", async () => {
+  const token = fetchToken()
+  if(token){
   try {
     const {
       data: { posts },
     } = await fetchUserData();
     console.log(posts);
+    let allMessages = []
     posts.forEach((post) => {
-      post.messages.length > 0 && renderMessages(post);
+      post.messages.length > 0 && allMessages.push(post.messages);
     });
+    renderAllMessages(allMessages.flat())
     $("#exampleModal").addClass("open");
   } catch (error) {
     throw error;
   }
+}
 });
 
 //Header button to logout
 $("#logOut-headerBtn").on("click", () => {
   localStorage.removeItem("token");
-
+  
   showHomePage();
 });
 
