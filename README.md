@@ -1,4 +1,4 @@
-# Mock-up Craighlist site
+# Mock-up Craigslist site
 
 Showcasing CRUD trough API calls, Data Flow and Rendering.
 Just Create a new user and check it out.
