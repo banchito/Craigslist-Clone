@@ -190,6 +190,8 @@ function showHomePage() {
   $("#post-form").css("visibility", "hidden");
   $("#post-form").addClass("disabled");
   $("#allMesgs-headerBtn").addClass('disabled')
+  loginClick = false;
+  signClick = false;
   fetchAndRender();
 }
 
